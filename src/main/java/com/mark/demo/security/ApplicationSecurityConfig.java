@@ -12,6 +12,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 
+import static com.mark.demo.security.ApplicationUserRoles.*;
+
 @Configuration
 @EnableWebSecurity
 public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
@@ -35,8 +37,8 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests()
-                .antMatchers("/","index","/css/*","/js/*")
-                .permitAll()
+                .antMatchers("/","index","/css/*","/js/*").permitAll()
+                .antMatchers("/api/**").hasRole(ADMIN.name())
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -49,11 +51,18 @@ public class ApplicationSecurityConfig extends WebSecurityConfigurerAdapter {
         UserDetails markNzeiUser = User.builder()
                 .username("marknzei")
                 .password(passwordEncoder.encode("password"))
-                .roles("STUDENT") // ROLE_STUDENT
+                .roles(STUDENT.name()) // ROLE_STUDENT
+                .build();
+
+        UserDetails adminUser = User.builder()
+                .username("joanna")
+                .password(passwordEncoder.encode("kanyinsola"))
+                .roles(ADMIN.name())
                 .build();
 
         return new InMemoryUserDetailsManager(
-                markNzeiUser
+                markNzeiUser,
+                adminUser
         );
     }
 }
